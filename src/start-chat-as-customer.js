@@ -54,6 +54,42 @@ export const deactivateChat = async ({ customerAccessToken, chatId }) => {
   return null;
 };
 
+const startChat = async ({ customerAccessToken }) => {
+  const rawResponse = await fetch(
+    `https://api.livechatinc.com/v3.3/customer/action/start_chat?license_id=${LICENSE_ID}`,
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${customerAccessToken}`
+      },
+      // body: JSON.stringify({})
+      body: JSON.stringify({
+        chat: {
+          thread: {
+            events: [
+              {
+                type: "message",
+                text: `I just sent a custom message as a customer! So Cool 😎.
+
+                  Current Date is: ${new Date().toString()}`
+              }
+            ]
+          }
+        }
+      })
+    }
+  );
+  const content = await rawResponse.json();
+  if (rawResponse.ok) {
+    console.log("Chat started -> ", content);
+    return content;
+  }
+  console.error("Chat could not be started -> ", content);
+  return null;
+};
+
 const resumeChat = async ({ customerAccessToken, chatId }) => {
   const rawResponse = await fetch(
     `https://api.livechatinc.com/v3.3/customer/action/resume_chat?license_id=${LICENSE_ID}`,
@@ -104,16 +140,15 @@ export const onStartChatClick = async () => {
     const customerAccessToken = customer.access_token;
     const chatId = window.LiveChatWidget.get("chat_data").chatId;
 
-    // const chatStart = await startChat({
-    //   customerAccessToken: customer.access_token
-    // });
-    // await deactivateChat({
-    //   chatId: chatStart.chat_id,
-    //   customerAccessToken
-    // });
-    await resumeChat({
-      chatId,
-      customerAccessToken
-    });
+    if (chatId){
+      await resumeChat({
+        chatId,
+        customerAccessToken
+      });
+    }else {
+      await startChat({
+        customerAccessToken: customer.access_token
+      });
+    }
   });
 };
