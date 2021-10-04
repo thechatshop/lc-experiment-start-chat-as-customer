@@ -30,7 +30,7 @@ const getCustomerToken = async ({ entity_id } = {}) => {
 };
 
 // https://developers.livechat.com/docs/messaging/customer-chat-api/#start-chat
-const deactivateChat = async ({ customerAccessToken, chatId }) => {
+export const deactivateChat = async ({ customerAccessToken, chatId }) => {
   const rawResponse = await fetch(
     `https://api.livechatinc.com/v3.3/customer/action/deactivate_chat?license_id=${LICENSE_ID}`,
     {
@@ -111,7 +111,7 @@ export const onStartChatClick = async () => {
     //   chatId: chatStart.chat_id,
     //   customerAccessToken
     // });
-    const chatResume = await resumeChat({
+    await resumeChat({
       chatId,
       customerAccessToken
     });
